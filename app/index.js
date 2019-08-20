@@ -2,6 +2,7 @@ const Koa = require('koa');
 const koaBody = require('koa-body');
 const koaError = require('koa-json-error')
 const parameter = require('koa-parameter')
+const koaStatic = require('koa-static')
 const mongoose = require('mongoose')
 const path = require('path')
 
@@ -16,6 +17,7 @@ mongoose.connection.on('error', console.error)
 
 const app = new Koa();
 
+app.use(koaStatic(path.join(__dirname, 'public')))
 app.use(parameter(app))
 app.use(koaError({
   postFormat: (e, { stack, ...rest }) => process.env.NODE_ENV === 'production' ? rest : ({ stack, ...rest })
