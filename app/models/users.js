@@ -29,24 +29,26 @@ const userSchema = new Schema({
     type: String,
   },
   locations: { // 居住地
-    type: [{ type: String }],
+    type: [{ type: Schema.Types.ObjectId, ref: 'Topic' }],
+    ref: 'Topic',
     select: false,
   },
   business: { // 所在行业
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Topic',
     select: false,
   },
   employments: { // 职业经历
     type: [{
-      company: { type: String },
-      job: { type: String }
+      company: { type: Schema.Types.ObjectId, ref: 'Topic' },
+      job: { type: Schema.Types.ObjectId, ref: 'Topic' }
     }],
     select: false,
   },
   educations: { // 教育经历
     type: [{
-      school: { type: String },
-      major: { type: String }, // 专业
+      school: { type: Schema.Types.ObjectId, ref: 'Topic' },
+      major: { type: Schema.Types.ObjectId, ref: 'Topic' }, // 专业
       diploma: { type: Number, enum: [1, 2, 3, 4, 5] }, // 学历 1：高中及以下 2：大专 3：本科 4：硕士 5：博士及以上
       entrance_year: { type: Number }, // 入学年份
       graduation_year: { type: Number }, // 毕业年份

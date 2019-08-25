@@ -26,7 +26,17 @@ class UserCtl {
   async findById (ctx) {
     const { fields = '' } = ctx.query
     const selectFields = fields.split(';').filter(f => f).map(f => ' +' + f).join('')
+    const populateStr = fields.split(';').filter(f => f).map(f => {
+      if (f === 'employments') {
+        return 'employments.company employment.job'
+      }
+      if (f === 'educations') {
+        return 'educations.school educations.major'
+      }
+      return f
+    }).join(' ')
     const user = await User.findById(ctx.params.id).select(selectFields)
+      .populate(populateStr)
     if (!user) {
       ctx.throw(404, '用户不存在')
     } else {
@@ -91,6 +101,7 @@ class UserCtl {
       },
     })
     const user = await User.findByIdAndUpdate(ctx.params.id, ctx.request.body)
+    console.log(user, 'user')
     if (!user) ctx.throw(404, '用户不存在')
     ctx.body = user
   }
