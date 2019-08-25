@@ -52,6 +52,13 @@ const userSchema = new Schema({
       graduation_year: { type: Number }, // 毕业年份
     }],
     select: false,
+  },
+  following: { // 关注
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    select: false,
   }
 })
 

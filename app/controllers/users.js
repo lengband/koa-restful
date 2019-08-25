@@ -109,6 +109,37 @@ class UserCtl {
     })
     ctx.body = { token }
   }
+  async listFollowing (ctx) {
+    const user = await User.findById(ctx.params.id).select('+following').populate('following')
+    if (!user) ctx.throw(404)
+    ctx.body = user.following
+  }
+  async listFollowers (ctx) { // 粉丝list
+    const user = await User.find({ following: ctx.params.id })
+    ctx.body = user
+  }
+  async checkUserExist (ctx, next) { // 中间件，检查 params.id 是否存在
+    const user = await User.findById(ctx.params.id)
+    if (!user) ctx.throw(404, '用户不存在')
+    await next()
+  }
+  async follow (ctx) { // 关注
+    const me = await User.findById(ctx.state.user._id).select('+following') // 登录人的关注者列表
+    if (!me.following.map(id => id.toString()).includes(ctx.params.id)) {
+      me.following.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 200
+  }
+  async unfollow (ctx) { // 取消关注
+    const me = await User.findById(ctx.state.user._id).select('+following') // 登录人的关注者列表
+    const index = me.following.map(id => id.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.following.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
+  }
 }
 
 module.exports = new UserCtl()
