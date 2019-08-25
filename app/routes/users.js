@@ -1,6 +1,7 @@
 const Router = require('koa-router');
 const jwt = require('koa-jwt')
-const { find, findById, create, update, del, login, checkOwner, listFollowing, follow, unfollow, listFollowers, checkUserExist } = require('../controllers/users')
+const { find, findById, create, update, del, login, checkOwner, listFollowing, follow, unfollow, listFollowers, checkUserExist, followTopic, unfollowTopic, listFollowingTopics } = require('../controllers/users')
+const { checkTopicExist } = require('../controllers/topics')
 const { secret } = require('../config')
 
 // 认证中间件
@@ -27,15 +28,18 @@ const router = new Router({
 });
 
 router
-  .get('/', find)
-  .get('/:id', findById)
-  .get('/:id/following', listFollowing)
-  .get('/:id/followers', listFollowers)
-  .post('/', create)
-  .post('/login', login)
-  .delete('/:id', auth, checkOwner, del)
-  .delete('/following/:id', auth, checkUserExist, unfollow)
-  .patch('/:id', auth, checkOwner, update)
-  .put('/following/:id', auth, checkUserExist, follow)
+  .get('/', find) // 用户列表
+  .get('/:id', findById) // 用户详情
+  .get('/:id/following', listFollowing) // 关注列表
+  .get('/:id/followingTopics', listFollowingTopics) // 关注话题列表
+  .get('/:id/followers', listFollowers) // 粉丝列表
+  .post('/', create) // 创建
+  .post('/login', login) // 登录
+  .delete('/:id', auth, checkOwner, del) // 删除
+  .delete('/following/:id', auth, checkUserExist, unfollow) // 取消关注
+  .delete('/followingTopics/:id', auth, checkTopicExist, unfollowTopic) // 取消关注话题
+  .patch('/:id', auth, checkOwner, update) // 修改
+  .put('/following/:id', auth, checkUserExist, follow) // 关注
+  .put('/followingTopics/:id', auth, checkTopicExist, followTopic) // 关注话题
 
 module.exports = router

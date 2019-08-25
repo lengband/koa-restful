@@ -1,4 +1,5 @@
 const Topic = require('../models/topics')
+const User = require('../models/users')
 
 const verifyParams = {
   name: {
@@ -17,6 +18,12 @@ const verifyParams = {
 
 
 class TopicsCtl {
+  // 话题是否存在
+  async checkTopicExist (ctx, next) {
+    const topic = await Topic.findById(ctx.params.id)
+    if (!topic) ctx.throw(404, '话题不存在')
+    await next()
+  }
   async find (ctx) {
     const { per_page = 10 } = ctx.query
     const page = Math.max(ctx.query.page * 1, 1) - 1 // 转换为数字
@@ -50,8 +57,12 @@ class TopicsCtl {
     ctx.body = topic
   }
   async del (ctx) {
-    const topic = await Topic.findByIdAndDelete(ctx.params.id)
-    ctx.body = topic
+    // const topic = await Topic.findByIdAndDelete(ctx.params.id)
+    ctx.body = '暂不开放删除话题功能'
+  }
+  async listTopicFollowers (ctx) { // 话题粉丝list
+    const user = await User.find({ followingTopics: ctx.params.id })
+    ctx.body = user
   }
 }
 

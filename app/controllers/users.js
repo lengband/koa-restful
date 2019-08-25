@@ -101,7 +101,6 @@ class UserCtl {
       },
     })
     const user = await User.findByIdAndUpdate(ctx.params.id, ctx.request.body)
-    console.log(user, 'user')
     if (!user) ctx.throw(404, '用户不存在')
     ctx.body = user
   }
@@ -127,7 +126,7 @@ class UserCtl {
   }
   async listFollowing (ctx) {
     const user = await User.findById(ctx.params.id).select('+following').populate('following')
-    if (!user) ctx.throw(404)
+    if (!user) ctx.throw(404, '用户不存在')
     ctx.body = user.following
   }
   async listFollowers (ctx) { // 粉丝list
@@ -147,11 +146,33 @@ class UserCtl {
     }
     ctx.status = 200
   }
+  async followTopic (ctx) { // 关注话题
+    const me = await User.findById(ctx.state.user._id).select('+followingTopics') // 登录人的关注者列表
+    if (!me.followingTopics.map(id => id.toString()).includes(ctx.params.id)) {
+      me.followingTopics.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 200
+  }
+  async listFollowingTopics (ctx) { // 用户关注话题列表
+    const user = await User.findById(ctx.params.id).select('+followingTopics').populate('followingTopics')
+    if (!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.followingTopics
+  }
   async unfollow (ctx) { // 取消关注
     const me = await User.findById(ctx.state.user._id).select('+following') // 登录人的关注者列表
     const index = me.following.map(id => id.toString()).indexOf(ctx.params.id)
     if (index > -1) {
       me.following.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
+  }
+  async unfollowTopic (ctx) { // 取消关注话题
+    const me = await User.findById(ctx.state.user._id).select('+followingTopics') // 登录人的关注者列表
+    const index = me.followingTopics.map(id => id.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.followingTopics.splice(index, 1)
       me.save()
     }
     ctx.status = 204

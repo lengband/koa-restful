@@ -61,6 +61,13 @@ const userSchema = new Schema({
       ref: 'User',
     }],
     select: false,
+  },
+  followingTopics: {
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Topic',
+    }],
+    select: false
   }
 })
 
