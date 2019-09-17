@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const jwt = require('koa-jwt')
-const { find, findById, create, update, del, login, checkOwner, listFollowing, follow, unfollow, listFollowers, checkUserExist, followTopic, unfollowTopic, listFollowingTopics } = require('../controllers/users')
+const { find, findById, create, update, del, login, checkOwner, listFollowing, follow, unfollow, listFollowers, checkUserExist, followTopic, unfollowTopic, listFollowingTopics, listQuestions } = require('../controllers/users')
 const { checkTopicExist } = require('../controllers/topics')
 const { secret } = require('../config')
 
@@ -33,6 +33,7 @@ router
   .get('/:id/following', listFollowing) // 关注列表
   .get('/:id/followingTopics', listFollowingTopics) // 关注话题列表
   .get('/:id/followers', listFollowers) // 粉丝列表
+  .get('/:id/questions', listQuestions) // 问题列表
   .post('/', create) // 创建
   .post('/login', login) // 登录
   .delete('/:id', auth, checkOwner, del) // 删除

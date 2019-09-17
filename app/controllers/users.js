@@ -1,5 +1,6 @@
 const jsonwebtoken = require('jsonwebtoken')
 const User = require('../models/users')
+const Question = require('../models/questions')
 const { secret } = require('../config')
 
 const verifyParams = {
@@ -176,6 +177,10 @@ class UserCtl {
       me.save()
     }
     ctx.status = 204
+  }
+  async listQuestions (ctx) { // 列出用户的问题列表
+    const questions = await Question.find({ questioner: ctx.params.id })
+    ctx.body = questions
   }
 }
 
