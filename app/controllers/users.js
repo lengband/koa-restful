@@ -1,6 +1,7 @@
 const jsonwebtoken = require('jsonwebtoken')
 const User = require('../models/users')
 const Question = require('../models/questions')
+const Answer = require('../models/answers')
 const { secret } = require('../config')
 
 const verifyParams = {
@@ -181,6 +182,58 @@ class UserCtl {
   async listQuestions (ctx) { // 列出用户的问题列表
     const questions = await Question.find({ questioner: ctx.params.id })
     ctx.body = questions
+  }
+  // 赞相关：👍
+  async listLikingAnwers (ctx) { // 用户点赞的答案列表
+    const user = await User.findById(ctx.params.id).select('+likingAnswers').populate('likingAnswers')
+    if (!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.likingAnswers
+  }
+  async likeAnswer (ctx, next) { // 点赞答案
+    const me = await User.findById(ctx.state.user._id).select('+likingAnswers') // 登录人的关注者列表
+    if (!me.likingAnswers.map(id => id.toString()).indexOf(ctx.params.id)) {
+      me.likingAnswers.push(ctx.params.id)
+      me.save()
+      // 业务：仅赞会影响投票数，踩不会影响
+      await Answer.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: 1 } }) // $inc 数据库内摸一个字段进行计算
+    }
+    ctx.status = 204
+    await next()
+  }
+  async unlikeAnswer (ctx) { // 取消喜欢答案
+    const me = await User.findById(ctx.state.user._id).select('+likingAnswers') // 登录人的关注者列表
+    const index = me.likingAnswers.map(id => id.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.followingTopics.splice(index, 1)
+      me.save()
+      // 业务：仅赞会影响投票数，踩不会影响
+      await Answer.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: -1 } }) // $inc 数据库内摸一个字段进行计算
+    }
+    ctx.status = 204
+  }
+  // 踩相关：👎
+  async listdisLikingAnwers (ctx) { // 用户踩的答案列表
+    const user = await User.findById(ctx.params.id).select('+dislikingAnswers').populate('dislikingAnswers')
+    if (!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.dislikingAnswers
+  }
+  async dislikeAnswer (ctx, next) { // 踩答案
+    const me = await User.findById(ctx.state.user._id).select('+dislikingAnswers') // 登录人的关注者列表
+    if (!me.dislikingAnswers.map(id => id.toString()).indexOf(ctx.params.id)) {
+      me.dislikingAnswers.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 204
+    await next()
+  }
+  async undislikeAnswer (ctx) { // 取消踩答案
+    const me = await User.findById(ctx.state.user._id).select('+dislikingAnswers') // 登录人的关注者列表
+    const index = me.dislikingAnswers.map(id => id.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.followingTopics.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
   }
 }
 

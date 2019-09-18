@@ -7,6 +7,7 @@ const answerSchema = new Schema({
   content: { type: String, required: true },
   answerer: { type: Schema.Types.ObjectId, ref: 'User', required: true, select: false },
   questionId: { type: String, required: true }, // 记录答案从属于哪个问题
+  voteCount: { type: Number, required: true, default: 0 } // 投票数
 })
 
 module.exports = model('Answer', answerSchema)
