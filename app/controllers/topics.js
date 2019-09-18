@@ -1,5 +1,6 @@
 const Topic = require('../models/topics')
 const User = require('../models/users')
+const Question = require('../models/questions')
 
 const verifyParams = {
   name: {
@@ -63,6 +64,10 @@ class TopicsCtl {
   async listTopicFollowers (ctx) { // 话题粉丝list
     const user = await User.find({ followingTopics: ctx.params.id })
     ctx.body = user
+  }
+  async listQuestions(ctx) {
+    const questions = await Question.find({ topics: ctx.params.id })
+    ctx.body = questions
   }
 }
 

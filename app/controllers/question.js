@@ -38,7 +38,7 @@ class QuestionCtl {
   async findById (ctx) {
     const { fields = '' } = ctx.query
     const selectFields = fields.split(';').filter(f => f).map(f => ' +' + f).join('')
-    const question = await Question.findById(ctx.params.id).select(selectFields).populate('questioner')
+    const question = await Question.findById(ctx.params.id).select(selectFields).populate('questioner topics')
     if (!question) {
       ctx.throw(404, '问题不存在')
     } else {
