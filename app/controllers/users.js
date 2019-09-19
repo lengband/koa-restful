@@ -235,6 +235,30 @@ class UserCtl {
     }
     ctx.status = 204
   }
+  // 收藏相关：
+  async listCollectingAnwers (ctx) { // 用户踩的答案列表
+    const user = await User.findById(ctx.params.id).select('+collectingAnswers').populate('collectingAnswers')
+    if (!user) ctx.throw(404, '用户不存在')
+    ctx.body = user.collectingAnswers
+  }
+  async collectAnswer (ctx, next) { // 踩答案
+    const me = await User.findById(ctx.state.user._id).select('+collectingAnswers') // 登录人的关注者列表
+    if (!me.collectingAnswers.map(id => id.toString()).indexOf(ctx.params.id)) {
+      me.collectingAnswers.push(ctx.params.id)
+      me.save()
+    }
+    ctx.status = 204
+    await next()
+  }
+  async uncollectAnswer (ctx) { // 取消踩答案
+    const me = await User.findById(ctx.state.user._id).select('+collectingAnswers') // 登录人的关注者列表
+    const index = me.collectingAnswers.map(id => id.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.followingTopics.splice(index, 1)
+      me.save()
+    }
+    ctx.status = 204
+  }
 }
 
 module.exports = new UserCtl()

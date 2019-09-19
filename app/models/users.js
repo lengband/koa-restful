@@ -82,6 +82,13 @@ const userSchema = new Schema({
       ref: 'Answer',
     }],
     select: false
+  },
+  collectingAnswers: { // 用户收藏的答案👎
+    type: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Answer',
+    }],
+    select: false
   }
 })
 
