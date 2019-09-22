@@ -5,6 +5,14 @@ const verifyParams = {
     type: 'string',
     required: true
   },
+  rootCommentId: {
+    type: 'string',
+    required: false
+  },
+  replyTo: {
+    type: 'string',
+    required: false
+  },
 }
 
 class CommentCtl {
@@ -30,11 +38,12 @@ class CommentCtl {
     const page = Math.max(ctx.query.page * 1, 1) - 1 // 转换为数字
     const perPage = Math.max(per_page * 1, 1)
     const q = new RegExp(ctx.query.q)
+    const { rootCommentId } = ctx.query
     const { questionId, answerId } = ctx.params
     ctx.body = await Comment
-    .find({content: q, questionId, answerId }) // .find({ name: '清华大学' }) // 精确匹配
+    .find({content: q, questionId, answerId, rootCommentId }) // .find({ name: '清华大学' }) // 精确匹配
     .limit(perPage).skip(page * perPage)
-    .populate('commentator')
+    .populate('commentator replyTo')
   }
   async findById (ctx) {
     const { fields = '' } = ctx.query
@@ -54,7 +63,8 @@ class CommentCtl {
   }
   async update (ctx) {
     ctx.verifyParams(verifyParams)
-    await ctx.state.comment.update(ctx.request.body)
+    const { content } = ctx.request.content
+    await ctx.state.comment.update({ content })
     ctx.body = ctx.state.comment
   }
   async delete (ctx) {
