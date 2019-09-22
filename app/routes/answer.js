@@ -1,6 +1,6 @@
 const Router = require('koa-router');
 const jwt = require('koa-jwt')
-const { find, findById, create, update, delete: del, checkAnswerExist, checkAnswerer } = require('../controllers/answers')
+const { find, findById, create, update, delete: del, checkAnswerExist, checkAnswerer } = require('../controllers/answer')
 const { secret } = require('../config')
 
 // 认证中间件

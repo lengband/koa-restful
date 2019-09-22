@@ -1,4 +1,4 @@
-const answer = require('../models/answers')
+const Answer = require('../models/answers')
 
 const verifyParams = {
   content: {
@@ -13,7 +13,7 @@ class AnswerCtl {
     const answer = await Answer.findById(ctx.params.id).select('+answerer')
     if (!answer) ctx.throw(404, '答案不存在')
     // 只有在删改查答案的时候才检查此逻辑，赞和踩不坚持此逻辑
-    if (answer.questionId && answer.questionId !== ctx.params.questionId) ctx.throw(404, '该问题下没有此答案')
+    if (ctx.params.questionId && answer.questionId !== ctx.params.questionId) ctx.throw(404, '该问题下没有此答案')
     ctx.state.answer = answer
     await next()
   }
@@ -45,7 +45,7 @@ class AnswerCtl {
   }
   async create (ctx) {
     ctx.verifyParams(verifyParams)
-    const answer = await new answer({ ...ctx.request.body, answerer: ctx.state.user._id, questionId: ctx.params.questionId }).save()
+    const answer = await new Answer({ ...ctx.request.body, answerer: ctx.state.user._id, questionId: ctx.params.questionId }).save()
     ctx.body = answer
   }
   async update (ctx) {
