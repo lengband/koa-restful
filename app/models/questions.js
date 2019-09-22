@@ -11,6 +11,8 @@ const questionSchema = new Schema({
     type: [{ type: Schema.Types.ObjectId, ref: 'Topic' }],
     select: false,
   }
+}, {
+  timestamps: true, // 将自动添加 createAt 和 updateAt 两个字段
 })
 
 module.exports = model('Question', questionSchema)

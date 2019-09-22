@@ -18,6 +18,8 @@ const topicSchema = new Schema({
     type: String,
     select: false
   },
+}, {
+  timestamps: true, // 将自动添加 createAt 和 updateAt 两个字段
 })
 
 module.exports = model('Topic', topicSchema);
