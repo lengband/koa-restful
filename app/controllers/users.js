@@ -191,7 +191,7 @@ class UserCtl {
   }
   async likeAnswer (ctx, next) { // 点赞答案
     const me = await User.findById(ctx.state.user._id).select('+likingAnswers') // 登录人的关注者列表
-    if (!me.likingAnswers.map(id => id.toString()).indexOf(ctx.params.id)) {
+    if (!me.likingAnswers.map(id => id.toString()).includes(ctx.params.id)) {
       me.likingAnswers.push(ctx.params.id)
       me.save()
       // 业务：仅赞会影响投票数，踩不会影响
@@ -204,7 +204,7 @@ class UserCtl {
     const me = await User.findById(ctx.state.user._id).select('+likingAnswers') // 登录人的关注者列表
     const index = me.likingAnswers.map(id => id.toString()).indexOf(ctx.params.id)
     if (index > -1) {
-      me.followingTopics.splice(index, 1)
+      me.likingAnswers.splice(index, 1)
       me.save()
       // 业务：仅赞会影响投票数，踩不会影响
       await Answer.findByIdAndUpdate(ctx.params.id, { $inc: { voteCount: -1 } }) // $inc 数据库内摸一个字段进行计算
@@ -219,7 +219,7 @@ class UserCtl {
   }
   async dislikeAnswer (ctx, next) { // 踩答案
     const me = await User.findById(ctx.state.user._id).select('+dislikingAnswers') // 登录人的关注者列表
-    if (!me.dislikingAnswers.map(id => id.toString()).indexOf(ctx.params.id)) {
+    if (!me.dislikingAnswers.map(id => id.toString()).includes(ctx.params.id)) {
       me.dislikingAnswers.push(ctx.params.id)
       me.save()
     }
@@ -230,7 +230,7 @@ class UserCtl {
     const me = await User.findById(ctx.state.user._id).select('+dislikingAnswers') // 登录人的关注者列表
     const index = me.dislikingAnswers.map(id => id.toString()).indexOf(ctx.params.id)
     if (index > -1) {
-      me.followingTopics.splice(index, 1)
+      me.dislikingAnswers.splice(index, 1)
       me.save()
     }
     ctx.status = 204
@@ -243,7 +243,7 @@ class UserCtl {
   }
   async collectAnswer (ctx, next) { // 收藏答案
     const me = await User.findById(ctx.state.user._id).select('+collectingAnswers') // 登录人的关注者列表
-    if (!me.collectingAnswers.map(id => id.toString()).indexOf(ctx.params.id)) {
+    if (!me.collectingAnswers.map(id => id.toString()).includes(ctx.params.id)) {
       me.collectingAnswers.push(ctx.params.id)
       me.save()
     }
@@ -254,7 +254,7 @@ class UserCtl {
     const me = await User.findById(ctx.state.user._id).select('+collectingAnswers') // 登录人的关注者列表
     const index = me.collectingAnswers.map(id => id.toString()).indexOf(ctx.params.id)
     if (index > -1) {
-      me.followingTopics.splice(index, 1)
+      me.collectingAnswers.splice(index, 1)
       me.save()
     }
     ctx.status = 204
